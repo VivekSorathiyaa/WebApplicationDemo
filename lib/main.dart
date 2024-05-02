@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
@@ -33,18 +34,21 @@ class _PixabayGalleryState extends State<PixabayGallery> {
   ScrollController _scrollController = ScrollController();
   List<Map<String, dynamic>> _images = [];
   bool _loading = false;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
     _loadMoreImages(); // Load initial images
+    _startAutoScroll();
   }
 
   @override
   void dispose() {
     _scrollController.removeListener(_scrollListener);
     _searchController.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -91,6 +95,20 @@ class _PixabayGalleryState extends State<PixabayGallery> {
     } else {
       _loadMoreImages();
     }
+  }
+
+  void _startAutoScroll() {
+    _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+      if (_scrollController.hasClients) {
+        double targetScroll =
+            _scrollController.offset + 50.0; // Adjust the amount to scroll
+        _scrollController.animateTo(
+          targetScroll,
+          duration: Duration(seconds: 1),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
