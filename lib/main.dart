@@ -115,49 +115,52 @@ class _PixabayGalleryState extends State<PixabayGallery> {
           ),
         ),
       ),
-      body: Scrollbar(
-        thumbVisibility: true,
-        controller: _scrollController,
-        child: GridView.builder(
-          controller: _scrollController,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: MediaQuery.of(context).size.width ~/ 200,
-            crossAxisSpacing: 4.0,
-            mainAxisSpacing: 4.0,
-          ),
-          itemCount: _images.length,
-          itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    transitionsBuilder:
-                        (context, animation, secondAnimation, child) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      );
-                    },
-                    pageBuilder: (context, animation, secondAnimation) {
-                      return FullScreenImage(
-                        imageUrl: _images[index]['largeImageURL'],
-                      );
-                    },
-                    transitionDuration: Duration(milliseconds: 500),
-                  ),
-                );
-              },
-              child: Hero(
-                tag: 'image$index',
-                child: Image.network(
-                  _images[index]['webformatURL'],
-                  fit: BoxFit.cover,
+      body: _images.isEmpty && _loading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : Scrollbar(
+              controller: _scrollController,
+              child: GridView.builder(
+                controller: _scrollController,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: MediaQuery.of(context).size.width ~/ 200,
+                  crossAxisSpacing: 4.0,
+                  mainAxisSpacing: 4.0,
                 ),
+                itemCount: _images.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          transitionsBuilder:
+                              (context, animation, secondAnimation, child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                          pageBuilder: (context, animation, secondAnimation) {
+                            return FullScreenImage(
+                              imageUrl: _images[index]['largeImageURL'],
+                            );
+                          },
+                          transitionDuration: Duration(milliseconds: 500),
+                        ),
+                      );
+                    },
+                    child: Hero(
+                      tag: 'image$index',
+                      child: Image.network(
+                        _images[index]['webformatURL'],
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
+            ),
     );
   }
 }
